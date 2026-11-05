@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>R17 Repair - Register Akun Baru</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
+    .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; width: 300px; }
+    input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+    button { width: 95%; padding: 10px; background-color: #34A853; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Daftar Akun Baru</h2>
+    <form id="register-form">
+      <input type="text" id="reg-name" placeholder="Nama Lengkap" required>
+      <input type="email" id="reg-email" placeholder="Email Anda" required>
+      <input type="password" id="reg-password" placeholder="Password (Min. 6 Karakter)" required>
+      <button type="submit">Daftar Sekarang</button>
+    </form>
+    <p id="message"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "firebase/app";
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+    import { getDatabase, ref, set, serverTimestamp } from "firebase/database";
+
+    // Kredensial Firebase R17 Repair Anda
+    const firebaseConfig = {
+      apiKey: "API_KEY_ANDA",
+      authDomain: "r17-repair.firebaseapp.com",
+      databaseURL: "https://r17-repair-default-rtdb.firebaseio.com",
+      projectId: "r17-repair",
+      storageBucket: "r17-repair.appspot.com",
+      messagingSenderId: "341565633454",
+      appId: "APP_ID_ANDA"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("reg-name").value;
+      const email = document.getElementById("reg-email").value;
+      const password = document.getElementById("reg-password").value;
+      const msg = document.getElementById("message");
+
+      try {
+        // 1. Buat akun baru di Firebase Authentication
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // 2. Beri nama tampilan (display name) pada profil Auth pengguna
+        await updateProfile(cred.user, { displayName: name });
+
+        // 3. Simpan profil lengkap dan inisialisasi saldo 10 token ke Realtime Database
+        await set(ref(db, `users/${cred.user.uid}`), {
+          displayName: name,
+          email: email,
+          role: "member",
+          tokenBalance: 10, 
+          createdAt: serverTimestamp()
+        });
+
+        msg.style.color = "green";
+        msg.innerText = "Pendaftaran berhasil! Akun Anda terbuat dengan 10 token gratis.";
+        document.getElementById("register-form").reset();
+      } catch (err) {
+        msg.style.color = "red";
+        msg.innerText = "Gagal mendaftar: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

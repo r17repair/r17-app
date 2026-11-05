@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>R17 Repair - Dashboard</title>
+</head>
+<body>
+  <h1>R17 Repair Dashboard</h1>
+  
+  <button id="btn-login">Login dengan Google</button>
+  <button id="btn-download">Unduh Firmware Premium (2 Token)</button>
+
+  <!-- Gunakan type="module" untuk mendukung ES Modules -->
+  <script type="module">
+    // Jika Anda menggunakan build tool (seperti Vite atau Webpack)
+    import { initializeApp } from "firebase/app";
+    import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+    import { getDatabase, ref, runTransaction, push, serverTimestamp } from "firebase/database";
+
+    // Konfigurasi Firebase menggunakan data project R17 Repair Anda
+    const firebaseConfig = {
+      apiKey: "API_KEY_ANDA",
+      authDomain: "r17-repair.firebaseapp.com",
+      databaseURL: "https://r17-repair-default-rtdb.firebaseio.com",
+      projectId: "r17-repair",
+      storageBucket: "r17-repair.appspot.com",
+      messagingSenderId: "341565633454",
+      appId: "APP_ID_ANDA"
+    };
+
+    // Inisialisasi Firebase App
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // === Masukkan Fungsi yang Sudah Kita Buat Sebelumnya di Sini ===
+    async function handleGoogleLogin() { 
+      // ... (kode handleGoogleLogin sebelumnya)
+    }
+
+    async function handleDownload(fileId, isMemberOnly, tokenCost) {
+      // ... (kode handleDownload sebelumnya)
+    }
+
+    // === Hubungkan Fungsi ke Elemen HTML setelah DOM siap ===
+    document.getElementById("btn-login").addEventListener("click", handleGoogleLogin);
+    
+    document.getElementById("btn-download").addEventListener("click", () => {
+      // Contoh memanggil unduhan dengan parameter (fileId, isMemberOnly, tokenCost)
+      handleDownload("xiaomi-note-10-firmware", true, 2);
+    });
+  </script>
+</body>
+</html>
