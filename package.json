@@ -1,0 +1,9 @@
+{
+  "name": "r17-app",
+  "version": "1.0.0",
+  "description": "R17 Repair Portal Hub",
+  "private": true,
+  "scripts": {
+    "start": "echo 'Static app ready'"
+  }
+}
