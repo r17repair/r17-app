@@ -1,16 +1,10 @@
 {
   "version": 2,
-  "public": true,
-  "builds": [
-    { "src": "public/**", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/login", "dest": "/public/auth/login.html" },
-    { "src": "/register", "dest": "/public/auth/register.html" },
-    { "src": "/firmware", "dest": "/public/webapps/firmware/index.html" },
-    { "src": "/schematic", "dest": "/public/webapps/schematic/index.html" },
-    { "src": "/tools", "dest": "/public/webapps/tools/index.html" },
-    { "src": "/tutorial", "dest": "/public/webapps/tutorial/index.html" },
-    { "src": "/(.*)", "dest": "/public/$1" }
+  "rewrites": [
+    { "source": "/login", "destination": "/auth/login.html" },
+    { "source": "/register", "destination": "/auth/register.html" },
+    { "source": "/firmware", "destination": "/webapps/firmware/firmware.html" },
+    { "source": "/schematic", "destination": "/webapps/schematic/schematic.html" },
+    { "source": "/tools", "destination": "/webapps/tools/tools.html" }
   ]
 }
