@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>R17 Repair - Secure App Portal & Session Hub</title>
-    <!-- Firebase SDK (v10.8.0) -->
+    
+    <!-- Firebase SDK & Modular App Initialization -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -14,20 +15,30 @@
             signInWithPopup, 
             signOut 
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Konfigurasi Firebase Project R17 Repair Anda (Ganti dengan API Key Firebase Anda)
+        // Konfigurasi Firebase Asli Proyek R17 Repair
         const firebaseConfig = {
-            apiKey: "AIzaSyYOUR_API_KEY_HERE",
+            apiKey: "AIzaSyCYzKTgPJsftAPgW1uV4t-ConZxLYCm_as",
             authDomain: "r17-repair.firebaseapp.com",
+            databaseURL: "https://r17-repair-default-rtdb.firebaseio.com",
             projectId: "r17-repair",
-            storageBucket: "r17-repair.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            storageBucket: "r17-repair.firebasestorage.app",
+            messagingSenderId: "341565633454",
+            appId: "1:341565633454:web:b2c36bb28eb0c344e28e3f",
+            measurementId: "G-5YHMSY98K7"
         };
 
         // Inisialisasi Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -39,30 +50,46 @@
             const userEmailEl = document.getElementById('user-email');
             const userPhotoEl = document.getElementById('user-photo');
             const sessionBadge = document.getElementById('session-badge');
+            const dbStatusEl = document.getElementById('db-status');
 
-            // Handler Login Google
+            // Proses Login Google dengan Penanganan Error yang Jelas
             loginBtn?.addEventListener('click', async () => {
                 try {
-                    await signInWithPopup(auth, provider);
+                    const result = await signInWithPopup(auth, provider);
+                    const user = result.user;
+
+                    // Sinkronisasi data ke Firestore Database
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
+
+                    if (!userSnap.exists()) {
+                        await setDoc(userRef, {
+                            uid: user.uid,
+                            name: user.displayName,
+                            email: user.email,
+                            photoURL: user.photoURL,
+                            role: "free",
+                            createdAt: serverTimestamp()
+                        });
+                    }
                 } catch (error) {
-                    console.error("Login failed:", error);
-                    alert("Gagal melakukan login. Silakan coba lagi.");
+                    console.error("Firebase Login Error:", error.code, error.message);
+                    alert("Gagal Login: " + error.message);
                 }
             });
 
-            // Handler Logout
+            // Proses Logout
             logoutBtn?.addEventListener('click', async () => {
                 try {
                     await signOut(auth);
                 } catch (error) {
-                    console.error("Logout failed:", error);
+                    console.error("Logout Error:", error);
                 }
             });
 
-            // Pantau Status Sesi Login Firebase secara Real-time
-            onAuthStateChanged(auth, (user) => {
+            // Pantau Sesi Real-time
+            onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    // User Aktif / Terautentikasi
                     if (guestState) guestState.style.display = 'none';
                     if (userState) userState.style.display = 'block';
 
@@ -71,29 +98,44 @@
                     if (userPhotoEl) userPhotoEl.src = user.photoURL || 'https://via.placeholder.com/40';
 
                     if (sessionBadge) {
-                        sessionBadge.textContent = '● ACTIVE SESSION (AUTHENTICATED)';
+                        sessionBadge.textContent = '● ACTIVE SESSION';
                         sessionBadge.className = 'session-badge active';
                     }
 
-                    // Buka Kunci Semua Link Skematik
+                    try {
+                        const userRef = doc(db, "users", user.uid);
+                        const userSnap = await getDoc(userRef);
+                        if (userSnap.exists() && dbStatusEl) {
+                            dbStatusEl.textContent = `Database Role: ${userSnap.data().role.toUpperCase()}`;
+                            dbStatusEl.style.color = '#34d399';
+                        }
+                    } catch (e) {
+                        console.error("Firestore read error:", e);
+                    }
+
+                    // Buka kunci link skematik terproteksi
                     document.querySelectorAll('.protected-link').forEach(link => {
                         link.classList.remove('disabled');
                         link.removeAttribute('title');
                     });
                 } else {
-                    // User Guest / Belum Login
                     if (guestState) guestState.style.display = 'block';
                     if (userState) userState.style.display = 'none';
 
                     if (sessionBadge) {
-                        sessionBadge.textContent = '○ GUEST SESSION (UNAUTHENTICATED)';
+                        sessionBadge.textContent = '○ GUEST SESSION';
                         sessionBadge.className = 'session-badge guest';
                     }
 
-                    // Kunci Semua Link Skematik
+                    if (dbStatusEl) {
+                        dbStatusEl.textContent = 'Database: Waiting for Auth';
+                        dbStatusEl.style.color = '#94a3b8';
+                    }
+
+                    // Kunci kembali link skematik
                     document.querySelectorAll('.protected-link').forEach(link => {
                         link.classList.add('disabled');
-                        link.setAttribute('title', 'Silakan Login terlebih dahulu untuk mengakses file ini.');
+                        link.setAttribute('title', 'Silakan Login terlebih dahulu.');
                     });
                 }
             });
@@ -102,273 +144,56 @@
     <style>
         :root {
             --header-bg: #0f172a;
-            --primary-navy: #002b66;      /* Biru Laut Tua */
-            --sky-blue: #0099ff;          /* Biru Langit Cerah */
+            --primary-navy: #002b66;      
+            --sky-blue: #0099ff;          
             --gradient-brand: linear-gradient(135deg, #002b66 0%, #0066cc 50%, #0099ff 100%);
-            --accent-green: #10b981;       /* Hijau Akses */
+            --accent-green: #10b981;       
             --bg-light: #f4f7fa;           
             --card-bg: #ffffff;
             --text-dark: #0f172a;
             --text-muted: #64748b;
             --border-color: #cbd5e1;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-            line-height: 1.6;
-        }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
         a { color: inherit; text-decoration: none; }
-
-        /* HEADER & NAVIGATION */
-        .header-wrap {
-            background-color: var(--header-bg);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .sf-utility-bar {
-            background-color: #0b1120;
-            border-bottom: 1px solid #1e293b;
-            font-size: 11px;
-        }
-
-        .sf-utility-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 6px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sf-utility-inner .nav-left a {
-            color: #94a3b8;
-            font-weight: 600;
-            margin-right: 15px;
-            transition: color 0.2s;
-        }
-
-        .sf-utility-inner .nav-left a:hover { color: #38bdf8; }
-
-        .session-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 12px;
-            text-transform: uppercase;
-        }
+        .header-wrap { background-color: var(--header-bg); position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .sf-utility-bar { background-color: #0b1120; border-bottom: 1px solid #1e293b; font-size: 11px; }
+        .sf-utility-inner { max-width: 1280px; margin: 0 auto; padding: 6px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .sf-utility-inner .nav-left a { color: #94a3b8; font-weight: 600; margin-right: 15px; }
+        .session-badge { font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 12px; text-transform: uppercase; }
         .session-badge.guest { background: #334155; color: #cbd5e1; }
         .session-badge.active { background: #065f46; color: #34d399; }
-
-        .header-top {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .brand-logo-img { 
-            height: 40px; 
-            width: 40px; 
-            object-fit: cover; 
-            border-radius: 50%; 
-            border: 2px solid var(--sky-blue);
-        }
-
-        .user-session-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .btn-auth {
-            background: var(--sky-blue);
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-auth:hover { background: #0077cc; }
+        .header-top { max-width: 1280px; margin: 0 auto; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .brand-logo-img { height: 40px; width: 40px; object-fit: cover; border-radius: 50%; border: 2px solid var(--sky-blue); }
+        .user-session-box { display: flex; align-items: center; gap: 12px; }
+        .btn-auth { background: var(--sky-blue); color: #ffffff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .btn-auth.logout { background: #ef4444; }
-        .btn-auth.logout:hover { background: #dc2626; }
-
-        .user-profile-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #ffffff;
-            font-size: 12px;
-        }
-
-        .user-profile-info img {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-green);
-        }
-
-        .sf-sub-nav {
-            background: var(--gradient-brand);
-            border-bottom: 3px solid var(--sky-blue);
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        .sf-sub-nav-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            padding: 0 10px;
-        }
-
-        .sf-sub-nav-inner a {
-            padding: 12px 18px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #ffffff;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .sf-sub-nav-inner a:hover, .sf-sub-nav-inner a.active {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        /* HERO SECTION */
-        .download-hero {
-            background: var(--gradient-brand);
-            color: #ffffff;
-            padding: 30px 20px;
-            border-bottom: 4px solid var(--sky-blue);
-        }
-
+        .user-profile-info { display: flex; align-items: center; gap: 10px; color: #ffffff; font-size: 12px; }
+        .user-profile-info img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--accent-green); }
+        .sf-sub-nav { background: var(--gradient-brand); border-bottom: 3px solid var(--sky-blue); }
+        .sf-sub-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; padding: 0 10px; }
+        .sf-sub-nav-inner a { padding: 12px 18px; font-size: 12px; font-weight: 800; color: #ffffff; text-transform: uppercase; }
+        .download-hero { background: var(--gradient-brand); color: #ffffff; padding: 30px 20px; border-bottom: 4px solid var(--sky-blue); }
         .hero-inner { max-width: 1280px; margin: 0 auto; }
         .hero-inner h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
         .hero-inner p { font-size: 13px; color: #e6f4ff; }
-
-        /* LAYOUT CONTAINER */
-        .container {
-            max-width: 1280px;
-            margin: 25px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 24px;
-        }
-
+        .container { max-width: 1280px; margin: 25px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
         @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
-
-        .download-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-        }
-
-        /* PROTECTED ITEM LIST */
-        .repo-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .repo-item-title {
-            font-weight: 800;
-            color: var(--primary-navy);
-            font-size: 15px;
-            display: block;
-        }
-
-        .repo-item-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .btn-access {
-            background: var(--accent-green);
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            transition: opacity 0.2s;
-            display: inline-block;
-        }
-
-        .btn-access.disabled {
-            background: #94a3b8 !important;
-            cursor: not-allowed;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-
-        /* SIDEBAR */
-        .sidebar-widget {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .widget-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--primary-navy);
-            border-bottom: 3px solid var(--sky-blue);
-            padding-bottom: 6px;
-            margin-bottom: 14px;
-            text-transform: uppercase;
-        }
-
+        .download-card { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; }
+        .repo-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+        .repo-item-title { font-weight: 800; color: var(--primary-navy); font-size: 15px; display: block; }
+        .repo-item-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .btn-access { background: var(--accent-green); color: #ffffff; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .btn-access.disabled { background: #94a3b8 !important; cursor: not-allowed; pointer-events: none; opacity: 0.6; }
+        .sidebar-widget { background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px; }
+        .widget-title { font-size: 13px; font-weight: 800; color: var(--primary-navy); border-bottom: 3px solid var(--sky-blue); padding-bottom: 6px; margin-bottom: 14px; text-transform: uppercase; }
         .sf-tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
-        .sf-tag-chip {
-            background: #e6f4ff;
-            color: var(--primary-navy);
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        /* FOOTER */
-        .footer-wrap {
-            background-color: #0f172a;
-            color: #94a3b8;
-            margin-top: 50px;
-            padding: 30px 20px 20px 20px;
-            border-top: 4px solid var(--sky-blue);
-            text-align: center;
-            font-size: 12px;
-        }
+        .sf-tag-chip { background: #e6f4ff; color: var(--primary-navy); padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+        .footer-wrap { background-color: #0f172a; color: #94a3b8; margin-top: 50px; padding: 30px 20px; border-top: 4px solid var(--sky-blue); text-align: center; font-size: 12px; }
     </style>
 </head>
 <body>
-
-    <!-- Header & Dual Navigation Bar -->
     <header class="header-wrap">
         <div class="sf-utility-bar">
             <div class="sf-utility-inner">
@@ -390,14 +215,9 @@
             </a>
             
             <div class="user-session-box">
-                <!-- State Belum Login -->
                 <div id="guest-state">
-                    <button id="login-btn" class="btn-auth">
-                        🔑 Login Teknisi Google
-                    </button>
+                    <button id="login-btn" class="btn-auth">🔑 Login Teknisi Google</button>
                 </div>
-
-                <!-- State Sudah Login -->
                 <div id="user-state" style="display: none;">
                     <div style="display: flex; align-items: center; gap: 15px;">
                         <div class="user-profile-info">
@@ -407,9 +227,7 @@
                                 <span id="user-email" style="font-size: 11px; color: #94a3b8;">-</span>
                             </div>
                         </div>
-                        <button id="logout-btn" class="btn-auth logout">
-                            Logout
-                        </button>
+                        <button id="logout-btn" class="btn-auth logout">Logout</button>
                     </div>
                 </div>
             </div>
@@ -418,33 +236,29 @@
         <nav class="sf-sub-nav">
             <div class="sf-sub-nav-inner">
                 <a class="active" href="#">App Portal Hub</a>
-                <a href="https://r17repair.github.io/schematic-view/" target="_blank">Schematic Repository</a>
+                <a href="/webapps/schematic/schematic.html">Schematic Repository</a>
                 <a href="https://r17repair.my.id" target="_blank">Blogger SEO Front</a>
             </div>
         </nav>
     </header>
 
-    <!-- Hero Section -->
     <section class="download-hero">
         <div class="hero-inner">
             <h1>R17 Interactive App Portal & Session Gateway</h1>
-            <p>Aplikasi pengontrol hak akses terpadu. Verifikasi akun teknisi Anda via Firebase Auth untuk membuka repository skematik dan dokumen eksklusif.</p>
+            <p>Database-backed session hub. Akun teknisi terverifikasi langsung disinkronkan ke Firebase Firestore.</p>
         </div>
     </section>
 
-    <!-- Main Content Area -->
     <div class="container">
         <main class="main-area">
-            
             <div class="download-card" style="border-left: 4px solid var(--accent-green);">
                 <h3 style="margin-bottom: 15px; color: var(--primary-navy); font-size: 18px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
                     📐 Protected Schematic Repository Access
                 </h3>
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
-                    File skematik interaktif di bawah ini dilindungi oleh Firebase Authentication. Harap pastikan status sesi Anda dalam keadaan <strong>ACTIVE SESSION</strong> untuk membuka dokumen.
+                    Akses skematik di bawah ini dikontrol oleh sesi Firebase Auth & database Cloud Firestore.
                 </p>
 
-                <!-- Item Skematik 1 -->
                 <div class="repo-item">
                     <div>
                         <span class="repo-item-title">Samsung Galaxy A50 (SM-A505)</span>
@@ -455,7 +269,6 @@
                     </a>
                 </div>
 
-                <!-- Item Skematik 2 -->
                 <div class="repo-item">
                     <div>
                         <span class="repo-item-title">Samsung Galaxy A60 (SM-A6060)</span>
@@ -465,47 +278,26 @@
                         Buka Skematik →
                     </a>
                 </div>
-
-                <!-- Item Skematik 3 -->
-                <div class="repo-item">
-                    <div>
-                        <span class="repo-item-title">Samsung Galaxy A70 (SM-A750FN)</span>
-                        <span class="repo-item-desc">Full Hardware Diagram & Troubleshooting</span>
-                    </div>
-                    <a href="https://r17repair.github.io/schematic-view/samsung/A70-SM-A750FN-PDF/index.html" target="_blank" class="btn-access protected-link disabled">
-                        Buka Skematik →
-                    </a>
-                </div>
             </div>
-
         </main>
 
-        <!-- Sidebar Area -->
         <aside class="sidebar">
             <div class="sidebar-widget">
-                <div class="widget-title">Status Proteksi Vercel</div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
-                    Sistem ini terhubung langsung dengan Firebase Auth SDK & GitHub Pages Repository.
+                <div class="widget-title">Database & Auth Status</div>
+                <p id="db-status" style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: 700;">
+                    Database: Waiting for Auth
                 </p>
                 <div class="sf-tags-cloud">
+                    <span class="sf-tag-chip">Firestore DB</span>
                     <span class="sf-tag-chip">Firebase Auth</span>
                     <span class="sf-tag-chip">Vercel Edge</span>
-                    <span class="sf-tag-chip">GitHub Pages</span>
                 </div>
-            </div>
-
-            <div class="sidebar-widget" style="background: var(--gradient-brand); color: white; border: none;">
-                <div class="widget-title" style="color: #ffffff; border-color: rgba(255,255,255,0.3);">Layanan R17 Cellservice</div>
-                <p style="font-size: 12px; color: #e6f4ff; margin-bottom: 12px;">Solusi perbaikan hardware & software HP bergaransi.</p>
-                <a href="https://r17cellservice.my.id" style="display: block; text-align: center; background: #ffffff; color: var(--primary-navy); padding: 10px; border-radius: 6px; font-weight: 800; font-size: 12px;" target="_blank">Order Service</a>
             </div>
         </aside>
     </div>
 
-    <!-- Footer -->
     <footer class="footer-wrap">
-        © 2026 <strong>R17 Cell Service</strong>. Integrated Vercel & Firebase Auth Portal.
+        © 2026 <strong>R17 Cell Service</strong>. Full Firebase Integration Node.
     </footer>
-
 </body>
 </html>
