@@ -1,10 +1,6 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/login", "destination": "/auth/login.html" },
-    { "source": "/register", "destination": "/auth/register.html" },
-    { "source": "/firmware", "destination": "/webapps/firmware/firmware.html" },
-    { "source": "/schematic", "destination": "/webapps/schematic/schematic.html" },
-    { "source": "/tools", "destination": "/webapps/tools/tools.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
