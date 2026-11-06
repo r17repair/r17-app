@@ -40,6 +40,33 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Bagian Tutorial & Panduan Servis Cepat */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <h2 className="text-lg font-extrabold text-[#002b66] mb-4 flex items-center gap-2">
+          💡 Panduan &amp; Tutorial Teknisi Pilihan
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">Bypass FRP</span>
+            <h3 className="font-bold text-slate-800 text-sm mt-2">Cara Bypass FRP Semua Versi Android Mediatek Terbaru</h3>
+            <p className="text-xs text-slate-500 mt-1">Panduan lengkap langkah demi langkah melewati verifikasi akun Google setelah reset pabrik.</p>
+            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
+          </div>
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Dead Boot</span>
+            <h3 className="font-bold text-slate-800 text-sm mt-2">Analisis Kerusakan Ponsel Mati Total (Dead Boot Repair)</h3>
+            <p className="text-xs text-slate-500 mt-1">Teknik pengecekan menggunakan Power Supply dan hukum Ohm dasar untuk melacak jalur short.</p>
+            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
+          </div>
+          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded">Emem / UFS</span>
+            <h3 className="font-bold text-slate-800 text-sm mt-2">Teknik Pembacaan IC eMMC &amp; UFS Menggunakan EasyJTAG</h3>
+            <p className="text-xs text-slate-500 mt-1">Solusi praktis dump file dan perbaikan partisi korup pada ponsel yang mengalami bootloop.</p>
+            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }

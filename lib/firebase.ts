@@ -1,20 +1,22 @@
 // lib/firebase.ts
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCYzKTgPJsftAPgW1uV4t-ConZxLYCm_as",
-  authDomain: "r17-repair.firebaseapp.com",
-  databaseURL: "https://r17-repair-default-rtdb.firebaseio.com",
-  projectId: "r17-repair",
-  storageBucket: "r17-repair.firebasestorage.app",
-  messagingSenderId: "341565633454",
-  appId: "1:341565633454:web:b2c36bb28eb0c344e28e3f",
-  measurementId: "G-5YHMSY98K7"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Mencegah duplikasi inisialisasi di Next.js
+// Inisialisasi Firebase (mencegah double init di Next.js)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const auth = getAuth(app);
-export const database = getDatabase(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+const database = getDatabase(app);
+
+export { auth, googleProvider, database };
