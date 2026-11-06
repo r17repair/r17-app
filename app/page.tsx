@@ -26,8 +26,16 @@ export default function Home() {
             Direktori File Unggulan
           </h2>
           {/* Uji Coba Komponen Counter Realtime Database */}
-          <DownloadBox fileId="firmware_xiaomi_note10" fileName="Xiaomi Redmi Note 10 Pro Stock ROM" />
-          <DownloadBox fileId="schematic_oppo_reno5" fileName="Oppo Reno 5 Boardview & Bitmap Schematic" />
+          <DownloadBox
+            fileId="firmware_xiaomi_note10"
+            fileName="Xiaomi Redmi Note 10 Pro Stock ROM"
+            filePath="firmware/firmware_xiaomi_note10"
+          />
+          <DownloadBox
+            fileId="schematic_oppo_reno5"
+            fileName="Oppo Reno 5 Boardview & Bitmap Schematic"
+            filePath="schematic/schematic_oppo_reno5"
+          />
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-fit">

@@ -63,7 +63,6 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b border-slate-200 shadow-sm">
-      {/* Top Bar / Navigation Links */}
       <div className="bg-[#002b66] text-white text-[11px] px-6 py-1.5 flex justify-between items-center">
         <div className="flex gap-6 font-medium tracking-wide">
           <Link href="#subscribe" className="hover:text-sky-300 transition">Subscribe</Link>
@@ -76,7 +75,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Main Brand & Login Bar */}
       <div className="max-w-7xl mx-auto px-6 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
         <div className="flex items-center gap-3">
           <div className="bg-[#0066cc] text-white font-extrabold w-9 h-9 rounded-lg flex items-center justify-center text-sm shadow-md border border-sky-400">
@@ -87,7 +85,6 @@ export default function Header() {
           </span>
         </div>
 
-        {/* Auth Section */}
         <div>
           {loading ? (
             <span className="text-xs text-slate-400">Memuat sesi...</span>
@@ -128,12 +125,12 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Navigation Menu Links */}
       <nav className="bg-[#0066cc] text-white text-xs font-bold px-6 py-2.5 flex gap-6 overflow-x-auto shadow-inner">
         <Link href="/" className="hover:text-sky-200 transition uppercase">Home Portal</Link>
         <Link href="/firmware" className="hover:text-sky-200 transition uppercase">Firmware Center</Link>
         <Link href="/schematic" className="hover:text-sky-200 transition uppercase">Schematic Center</Link>
         <Link href="/tools" className="hover:text-sky-200 transition uppercase">PC Tools &amp; Drivers</Link>
+        <Link href="/tutorials" className="hover:text-sky-200 transition uppercase">Tutorials</Link>
       </nav>
     </header>
   );

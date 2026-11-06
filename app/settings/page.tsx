@@ -15,27 +15,49 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
+    let unsubscribeProfile: (() => void) | undefined;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      unsubscribeProfile?.();
+      unsubscribeProfile = undefined;
       setUser(currentUser);
+      setLoadError(null);
+      setLoading(true);
+
       if (currentUser) {
         const userRef = ref(database, `users/${currentUser.uid}`);
-        onValue(userRef, (snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            setWorkshopName(data.workshopName || "");
-            setPhone(data.phone || "");
-            setRole(data.role || "free");
-          }
-          setLoading(false);
-        });
+        unsubscribeProfile = onValue(
+          userRef,
+          (snapshot) => {
+            if (snapshot.exists()) {
+              const data = snapshot.val();
+              setWorkshopName(data.workshopName || "");
+              setPhone(data.phone || "");
+              setRole(data.role || "free");
+            } else {
+              setWorkshopName("");
+              setPhone("");
+              setRole("free");
+            }
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Gagal memuat pengaturan profil:", error);
+            setLoadError("Data pengaturan tidak dapat dimuat. Periksa koneksi dan izin Firebase.");
+            setLoading(false);
+          },
+        );
       } else {
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeProfile?.();
+      unsubscribe();
+    };
   }, []);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -108,6 +130,12 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          {loadError && (
+            <p role="alert" className="mt-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700">
+              {loadError}
+            </p>
+          )}
+
           {message && (
             <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-lg font-medium">
               {message}
@@ -140,7 +168,7 @@ export default function SettingsPage() {
             <div className="pt-4 flex justify-end">
               <button 
                 type="submit" 
-                disabled={saving}
+                disabled={saving || Boolean(loadError)}
                 className="bg-[#0066cc] hover:bg-[#0055aa] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition shadow cursor-pointer disabled:opacity-50"
               >
                 {saving ? "Menyimpan..." : "Simpan Perubahan"}

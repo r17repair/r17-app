@@ -18,25 +18,41 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
+    let unsubscribeProfile: (() => void) | undefined;
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      unsubscribeProfile?.();
+      unsubscribeProfile = undefined;
       setUser(currentUser);
+      setProfile(null);
+      setLoadError(null);
+      setLoading(true);
+
       if (currentUser) {
-        // Ambil data profil realtime dari database
         const userRef = ref(database, `users/${currentUser.uid}`);
-        onValue(userRef, (snapshot) => {
-          if (snapshot.exists()) {
-            setProfile(snapshot.val());
-          }
-          setLoading(false);
-        });
+        unsubscribeProfile = onValue(
+          userRef,
+          (snapshot) => {
+            setProfile(snapshot.exists() ? snapshot.val() : null);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Gagal memuat profil teknisi:", error);
+            setLoadError("Data profil tidak dapat dimuat. Periksa koneksi dan izin Firebase.");
+            setLoading(false);
+          },
+        );
       } else {
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeProfile?.();
+      unsubscribe();
+    };
   }, []);
 
   if (loading) {
@@ -72,6 +88,11 @@ export default function ProfilePage() {
 
       {/* Kartu Detail User */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {loadError && (
+          <p role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+            {loadError}
+          </p>
+        )}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
           {user.photoURL && (
             <img src={user.photoURL} alt="Foto Profil" className="w-20 h-20 rounded-full border-2 border-[#0066cc]" />
