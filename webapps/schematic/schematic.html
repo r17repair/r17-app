@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>Schematic Center - R17 Repair Repository</title>
     
-    <meta name="description" content="Pusat skema diagram boardview, jalur hardware, dan layout PCB teknisi HP terintegrasi Vercel & Firebase Auth.">
+    <meta name="description" content="Pusat unduhan skema jalur handphone, boardview, dan bitmap interaktif terintegrasi Vercel & Firebase Auth.">
     <meta name="robots" content="index, follow">
 
     <!-- Firebase SDK (v10.8.0) Modular Authentication -->
@@ -54,6 +54,7 @@
             logoutBtn?.addEventListener('click', async () => {
                 try {
                     await signOut(auth);
+                    window.location.href = 'https://r17repair.my.id';
                 } catch (error) {
                     console.error("Logout failed:", error);
                 }
@@ -71,7 +72,7 @@
                         sessionBadge.className = 'session-badge active';
                     }
 
-                    // Aktifkan tombol skema terproteksi
+                    // Aktifkan tombol unduh skema terproteksi
                     document.querySelectorAll('.protected-download-btn').forEach(btn => {
                         btn.classList.remove('disabled');
                         btn.style.opacity = '1';
@@ -79,21 +80,8 @@
                         btn.removeAttribute('title');
                     });
                 } else {
-                    if (guestState) guestState.style.display = 'block';
-                    if (userState) userState.style.display = 'none';
-
-                    if (sessionBadge) {
-                        sessionBadge.textContent = '○ GUEST SESSION';
-                        sessionBadge.className = 'session-badge guest';
-                    }
-
-                    // Kunci tombol skema untuk tamu
-                    document.querySelectorAll('.protected-download-btn').forEach(btn => {
-                        btn.classList.add('disabled');
-                        btn.style.opacity = '0.5';
-                        btn.style.pointerEvents = 'none';
-                        btn.setAttribute('title', 'Silakan Login terlebih dahulu untuk melihat skema ini.');
-                    });
+                    // Jika belum login, arahkan kembali ke Landing Page Blogspot
+                    window.location.href = 'https://r17repair.my.id';
                 }
             });
         });
@@ -125,7 +113,6 @@
         a { color: inherit; text-decoration: none; }
         img { max-width: 100%; height: auto; display: block; }
 
-        /* HEADER & DUAL MENU BAR */
         .header-wrap {
             background-color: var(--header-bg);
             position: sticky;
@@ -182,6 +169,7 @@
         .user-profile-info { display: flex; align-items: center; gap: 10px; font-size: 12px; }
         .user-profile-info img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--accent-green); }
 
+        /* Menu Bar Dinamis */
         .sf-sub-nav {
             background: var(--gradient-brand); border-bottom: 3px solid var(--sky-blue); overflow-x: auto; white-space: nowrap;
         }
@@ -192,7 +180,6 @@
         }
         .sf-sub-nav-inner a:hover, .sf-sub-nav-inner a.active { background: rgba(0, 0, 0, 0.2); }
 
-        /* HERO SECTION */
         .download-hero {
             background: var(--gradient-brand); color: #ffffff; padding: 30px 20px; border-bottom: 4px solid var(--sky-blue);
         }
@@ -200,7 +187,6 @@
         .hero-inner h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
         .hero-inner p { font-size: 13px; color: #e6f4ff; }
 
-        /* CONTAINER & LAYOUT */
         .container {
             max-width: 1280px; margin: 25px auto; padding: 0 20px;
             display: grid; grid-template-columns: 1fr 340px; gap: 24px;
@@ -215,7 +201,6 @@
             padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px;
         }
 
-        /* TABLE SCHEMATIC */
         .schematic-table {
             width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px;
         }
@@ -227,12 +212,11 @@
         }
         .schematic-table td { color: var(--text-dark); font-weight: 600; }
 
-        .btn-view-schematic {
-            background: var(--primary-navy); color: #white; border: none; padding: 6px 14px;
+        .btn-download-schematic {
+            background: var(--accent-green); color: white; border: none; padding: 6px 14px;
             border-radius: 4px; font-size: 11px; font-weight: 700; cursor: pointer; text-transform: uppercase;
         }
 
-        /* SIDEBAR */
         .sidebar-widget {
             background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px;
         }
@@ -246,7 +230,6 @@
             border-radius: 4px; font-size: 12px; font-weight: 700; border: 1px solid #b3d9ff;
         }
 
-        /* FOOTER */
         .footer-wrap {
             background-color: #0f172a; color: #94a3b8; margin-top: 50px; padding: 40px 20px 20px 20px; border-top: 4px solid var(--sky-blue);
         }
@@ -303,21 +286,15 @@
             </div>
         </div>
         
-        <nav class="sf-sub-nav">
-            <div class="sf-sub-nav-inner">
-                <a href="/">Home Hub</a>
-                <a href="/webapps/firmware/firmware.html">Firmware Center</a>
-                <a class="active" href="/webapps/schematic/schematic.html">Schematic Center</a>
-                <a href="/webapps/tools/tools.html">PC Tools &amp; Drivers</a>
-            </div>
-        </nav>
+        <!-- Menu Bar Dinamis (Dimuat dari js/menu.js) -->
+        <nav class="sf-sub-nav" id="dynamic-navbar"></nav>
     </header>
 
     <!-- Hero Section -->
     <section class="download-hero">
         <div class="hero-inner">
-            <h1>Schematic &amp; Boardview Center</h1>
-            <p>Direktori skema diagram jalur PCB, bitmap layout, dan panduan pelacakan jalur hardware khusus teknisi.</p>
+            <h1>Schematic Center &amp; Boardview</h1>
+            <p>Direktori skema jalur kelistrikan handphone, layout PCB, dan bitmap interaktif untuk pelacakan kerusakan perangkat.</p>
         </div>
     </section>
 
@@ -325,42 +302,36 @@
     <div class="container">
         <main class="main-area">
             <div class="download-card">
-                <h2 style="color: var(--primary-navy); font-size: 20px; font-weight: 800; margin-bottom: 10px;">📐 Direktori Skematik &amp; Bitmap Terbaru</h2>
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Akses penampil skema dan jalur boardview akan terbuka setelah Anda melakukan Login Teknisi.</p>
+                <h2 style="color: var(--primary-navy); font-size: 20px; font-weight: 800; margin-bottom: 10px;">📐 Direktori Skema &amp; Boardview</h2>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Tombol unduh file skema di bawah ini akan aktif otomatis setelah Anda masuk menggunakan sesi teknisi.</p>
 
                 <table class="schematic-table">
                     <thead>
                         <tr>
                             <th>Model Perangkat</th>
-                            <th>Jenis Skema / Boardview</th>
-                            <th>Format File</th>
-                            <th>Aksi Akses</th>
+                            <th>Jenis Dokumen / Skema</th>
+                            <th>Format</th>
+                            <th>Aksi Unduh</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>iPhone 11 / 11 Pro Max</td>
-                            <td>Complete Schematic &amp; Bitmap Layout</td>
-                            <td>PDF / BV</td>
-                            <td><a class="btn-view-schematic protected-download-btn" href="#" target="_blank">🔍 Buka Skema</a></td>
+                            <td>iPhone 11 Pro Max</td>
+                            <td>Schematic Diagram &amp; Boardview Layout Official</td>
+                            <td>PDF &amp; BRD</td>
+                            <td><a class="btn-download-schematic protected-download-btn" href="#" target="_blank">📥 Unduh Skema</a></td>
+                        </tr>
+                        <tr>
+                            <td>Samsung Galaxy A51</td>
+                            <td>Full Schematics, Layout PCB, &amp; Troubleshooting Guide</td>
+                            <td>PDF Document</td>
+                            <td><a class="btn-download-schematic protected-download-btn" href="#" target="_blank">📥 Unduh Skema</a></td>
                         </tr>
                         <tr>
                             <td>Xiaomi Redmi Note 9 Pro</td>
-                            <td>Boardview &amp; Tracing Jalur Power</td>
-                            <td>BRD / PDF</td>
-                            <td><a class="btn-view-schematic protected-download-btn" href="#" target="_blank">🔍 Buka Skema</a></td>
-                        </tr>
-                        <tr>
-                            <td>Oppo A54 (CPH2239)</td>
-                            <td>Schematic Diagram &amp; Test Point Layout</td>
-                            <td>PDF</td>
-                            <td><a class="btn-view-schematic protected-download-btn" href="#" target="_blank">🔍 Buka Skema</a></td>
-                        </tr>
-                        <tr>
-                            <td>Samsung Galaxy A12</td>
-                            <td>Full Schematics &amp; Component Placement</td>
-                            <td>PDF</td>
-                            <td><a class="btn-view-schematic protected-download-btn" href="#" target="_blank">🔍 Buka Skema</a></td>
+                            <td>Bitmap Jalur &amp; Skema Blok Power Management (PMIC)</td>
+                            <td>PDF / Bitmap</td>
+                            <td><a class="btn-download-schematic protected-download-btn" href="#" target="_blank">📥 Unduh Skema</a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -370,17 +341,17 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-widget">
-                <div class="widget-title">Informasi Skema</div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Gunakan software pendukung seperti ZXW, Borneo Schematic, atau PDF Viewer untuk melihat detail jalur.</p>
+                <div class="widget-title">Panduan Viewer</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Gunakan software pendukung seperti ZXW Tools atau Bordview Reader untuk membuka file layout `.brd`.</p>
             </div>
 
             <div class="sidebar-widget">
-                <div class="widget-title">Kategori Skematik</div>
+                <div class="widget-title">Kategori Skema</div>
                 <div class="sf-tags-cloud">
                     <span class="sf-tag-chip">iPhone Boardview</span>
-                    <span class="sf-tag-chip">Android Schematic</span>
+                    <span class="sf-tag-chip">Samsung Schematics</span>
+                    <span class="sf-tag-chip">Xiaomi Layout</span>
                     <span class="sf-tag-chip">Bitmap Jalur</span>
-                    <span class="sf-tag-chip">Test Point</span>
                 </div>
             </div>
         </aside>
@@ -396,9 +367,9 @@
             <div class="footer-links">
                 <h4>Navigasi Utama</h4>
                 <ul>
-                    <li><a href="/">Home Hub</a></li>
-                    <li><a href="/webapps/firmware/firmware.html">Firmware Center</a></li>
-                    <li><a href="/webapps/schematic/schematic.html">Schematic Center</a></li>
+                    <li><a href="/">Repository</a></li>
+                    <li><a href="/firmware">Firmware Center</a></li>
+                    <li><a href="/schematic">Schematic Center</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -424,5 +395,8 @@
             &copy; <script>document.write(new Date().getFullYear())</script> <strong>R17 Cell Service</strong>. Integrated Vercel &amp; Firebase Ecosystem.
         </div>
     </footer>
+
+    <!-- Skrip Menu Dinamis -->
+    <script src="/js/menu.js"></script>
 </body>
 </html>

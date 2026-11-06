@@ -42,7 +42,6 @@
             const userPhotoEl = document.getElementById('user-photo');
             const sessionBadge = document.getElementById('session-badge');
 
-            // Login Google Popup
             loginBtn?.addEventListener('click', async () => {
                 try {
                     await signInWithPopup(auth, provider);
@@ -52,16 +51,15 @@
                 }
             });
 
-            // Logout Session
             logoutBtn?.addEventListener('click', async () => {
                 try {
                     await signOut(auth);
+                    window.location.href = 'https://r17repair.my.id';
                 } catch (error) {
                     console.error("Logout failed:", error);
                 }
             });
 
-            // Pantau Sesi Real-time
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     if (guestState) guestState.style.display = 'none';
@@ -73,26 +71,8 @@
                         sessionBadge.textContent = '● ACTIVE SESSION';
                         sessionBadge.className = 'session-badge active';
                     }
-
-                    // Buka proteksi link unduhan/skematik khusus member
-                    document.querySelectorAll('.protected-link').forEach(link => {
-                        link.classList.remove('disabled');
-                        link.removeAttribute('title');
-                    });
                 } else {
-                    if (guestState) guestState.style.display = 'block';
-                    if (userState) userState.style.display = 'none';
-
-                    if (sessionBadge) {
-                        sessionBadge.textContent = '○ GUEST SESSION';
-                        sessionBadge.className = 'session-badge guest';
-                    }
-
-                    // Kunci link untuk tamu
-                    document.querySelectorAll('.protected-link').forEach(link => {
-                        link.classList.add('disabled');
-                        link.setAttribute('title', 'Silakan Login terlebih dahulu untuk mengakses file ini.');
-                    });
+                    window.location.href = 'https://r17repair.my.id';
                 }
             });
         });
@@ -101,10 +81,10 @@
     <style>
         :root {
             --header-bg: #ffffff;
-            --primary-navy: #002b66;      /* Biru Laut Tua / Ocean Blue */
-            --sky-blue: #0099ff;          /* Biru Langit Cerah / Sky Blue */
+            --primary-navy: #002b66;      
+            --sky-blue: #0099ff;          
             --gradient-brand: linear-gradient(135deg, #002b66 0%, #0066cc 50%, #0099ff 100%);
-            --accent-green: #10b981;       /* Hijau untuk Tombol Download */
+            --accent-green: #10b981;       
             --bg-light: #f4f7fa;           
             --card-bg: #ffffff;
             --text-dark: #0f172a;
@@ -125,7 +105,6 @@
         a { color: inherit; text-decoration: none; }
         img { max-width: 100%; height: auto; display: block; }
 
-        /* --- HEADER & DUAL MENU BAR --- */
         .header-wrap {
             background-color: var(--header-bg);
             position: sticky;
@@ -151,49 +130,26 @@
         }
 
         .sf-utility-inner .nav-left a {
-            color: #94a3b8;
-            font-weight: 600;
-            margin-right: 20px;
-            transition: color 0.2s;
+            color: #94a3b8; font-weight: 600; margin-right: 20px; transition: color 0.2s;
         }
-
         .sf-utility-inner .nav-left a:hover { color: #38bdf8; }
 
         .session-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 12px;
-            text-transform: uppercase;
+            font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;
         }
         .session-badge.guest { background: #334155; color: #cbd5e1; }
         .session-badge.active { background: #065f46; color: #34d399; }
 
         .header-top {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            max-width: 1280px; margin: 0 auto; padding: 12px 20px;
+            display: flex; align-items: center; justify-content: space-between;
         }
 
-        .brand-logo-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-logo-img { 
-            height: 42px; width: 42px; object-fit: cover; border-radius: 50%; border: 2px solid var(--sky-blue);
-        }
-
-        .brand-title-text {
-            font-size: 16px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .brand-logo-container { display: flex; align-items: center; gap: 12px; }
+        .brand-logo-img { height: 42px; width: 42px; object-fit: cover; border-radius: 50%; border: 2px solid var(--sky-blue); }
+        .brand-title-text { font-size: 16px; font-weight: 800; color: var(--primary-navy); text-transform: uppercase; letter-spacing: 0.5px; }
 
         .user-session-box { display: flex; align-items: center; gap: 12px; }
-
         .btn-auth {
             background: var(--sky-blue); color: #ffffff; border: none; padding: 8px 16px;
             border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s;
@@ -215,103 +171,44 @@
             background: var(--sky-blue); border: none; padding: 0 12px; color: white; cursor: pointer; font-weight: bold;
         }
 
+        /* Styling untuk menu bar dinamis */
         .sf-sub-nav {
-            background: var(--gradient-brand);
-            border-bottom: 3px solid var(--sky-blue);
-            overflow-x: auto;
-            white-space: nowrap;
+            background: var(--gradient-brand); border-bottom: 3px solid var(--sky-blue); overflow-x: auto; white-space: nowrap;
         }
-
-        .sf-sub-nav-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            padding: 0 10px;
-        }
-
+        .sf-sub-nav-inner { max-width: 1280px; margin: 0 auto; display: flex; padding: 0 10px; }
         .sf-sub-nav-inner a {
-            padding: 12px 18px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #ffffff;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: background 0.2s;
+            padding: 12px 18px; font-size: 12px; font-weight: 800; color: #ffffff;
+            display: inline-block; text-transform: uppercase; letter-spacing: 0.5px; transition: background 0.2s;
         }
-
-        .sf-sub-nav-inner a:hover, .sf-sub-nav-inner a.active {
-            background: rgba(0, 0, 0, 0.2);
-        }
+        .sf-sub-nav-inner a:hover, .sf-sub-nav-inner a.active { background: rgba(0, 0, 0, 0.2); }
 
         .download-hero {
-            background: var(--gradient-brand);
-            color: #ffffff;
-            padding: 30px 20px;
-            border-bottom: 4px solid var(--sky-blue);
+            background: var(--gradient-brand); color: #ffffff; padding: 30px 20px; border-bottom: 4px solid var(--sky-blue);
         }
-
         .hero-inner { max-width: 1280px; margin: 0 auto; }
         .hero-inner h1 { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
         .hero-inner p { font-size: 13px; color: #e6f4ff; }
 
         .container {
-            max-width: 1280px;
-            margin: 25px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 24px;
+            max-width: 1280px; margin: 25px auto; padding: 0 20px;
+            display: grid; grid-template-columns: 1fr 340px; gap: 24px;
         }
-
         @media (max-width: 900px) {
             .container { grid-template-columns: 1fr; }
             .header-top { flex-direction: column; gap: 15px; align-items: flex-start; }
         }
 
         .download-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
+            background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color);
+            padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px;
         }
-
-        .btn-scroll-download {
-            background: var(--accent-green);
-            color: #ffffff;
-            padding: 16px 32px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 800;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
-            transition: transform 0.2s, opacity 0.2s;
-            cursor: pointer;
-            border: none;
-            text-transform: uppercase;
-        }
-        .btn-scroll-download:hover { transform: translateY(-2px); opacity: 0.95; }
 
         .sidebar-widget {
-            background: var(--card-bg);
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--card-bg); border-radius: 10px; border: 1px solid var(--border-color); padding: 20px; margin-bottom: 20px;
         }
-
         .widget-title {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--primary-navy);
-            border-bottom: 3px solid var(--sky-blue);
-            padding-bottom: 6px;
-            margin-bottom: 14px;
-            text-transform: uppercase;
+            font-size: 13px; font-weight: 800; color: var(--primary-navy);
+            border-bottom: 3px solid var(--sky-blue); padding-bottom: 6px; margin-bottom: 14px; text-transform: uppercase;
         }
 
         .sf-tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
@@ -384,21 +281,14 @@
             </div>
         </div>
         
-        <nav class="sf-sub-nav">
-            <div class="sf-sub-nav-inner">
-                <a class="active" href="/">Home Hub</a>
-                <a href="/firmware">Firmware Center</a>
-                <a href="/schematic">Schematic Center</a>
-                <a href="/tools">PC Tools &amp; Drivers</a>
-                <a href="/tutorial">Tutorial Repair</a>
-            </div>
-        </nav>
+        <!-- Menu Bar Vercel Dinamis (Dimuat dari js/menu.js) -->
+        <nav class="sf-sub-nav" id="dynamic-navbar"></nav>
     </header>
 
     <!-- Download Hero Section -->
     <section class="download-hero">
         <div class="hero-inner">
-            <h1>R17 Secure Repository &amp; Software Hub - Vercel App Portal</h1>
+            <h1>R17 Secure Repository &amp; Software Hub</h1>
             <p>Pusat verifikasi file master, direktori unduhan firmware, dan akses skematik aman terintegrasi dengan portal aplikasi Vercel &amp; Firebase Auth.</p>
         </div>
     </section>
@@ -408,25 +298,15 @@
         <main class="main-area">
             <div class="download-card">
                 <h2 style="color: var(--primary-navy); font-size: 22px; font-weight: 800; margin-bottom: 6px;">Portal Dashboard Utama Teknisi</h2>
-                <div class="project-stats-bar" style="display: flex; gap: 20px; font-size: 12px; color: var(--text-muted); margin: 15px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border-color);">
-                    <span>Status Jaringan: <strong style="color: var(--accent-green);">● Vercel Edge Active</strong></span>
-                    <span>Keamanan: <strong>Firebase Auth Enforced</strong></span>
-                </div>
-
                 <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 25px; border-radius: 8px; text-align: center; margin: 20px 0;">
                     <h3 style="color: var(--primary-navy); margin-bottom: 12px; font-size: 16px;">Akses Berkas Master &amp; Skematik Terproteksi</h3>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Silakan login menggunakan akun Google Anda di pojok kanan atas untuk membuka akses penuh seluruh layanan.</p>
+                    <p style="font-size: 13px; color: var(--text-muted);">Sesi Anda aktif. Silakan pilih menu layanan di atas untuk mulai mengelola perangkat.</p>
                 </div>
             </div>
         </main>
 
         <!-- Sidebar Area -->
         <aside class="sidebar">
-            <div class="sidebar-widget">
-                <div class="widget-title">Vercel Integration</div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Aplikasi ini berjalan di atas infrastruktur Vercel dengan proteksi sesi aman.</p>
-            </div>
-
             <div class="sidebar-widget">
                 <div class="widget-title">Top Searches</div>
                 <div class="sf-tags-cloud">
@@ -450,7 +330,7 @@
             <div class="footer-links">
                 <h4>Navigasi Utama</h4>
                 <ul>
-                    <li><a href="/">Home Hub</a></li>
+                    <li><a href="/">Repository</a></li>
                     <li><a href="/firmware">Firmware Center</a></li>
                     <li><a href="/schematic">Schematic Center</a></li>
                 </ul>
@@ -478,5 +358,8 @@
             &copy; <script>document.write(new Date().getFullYear())</script> <strong>R17 Cell Service</strong>. Integrated Vercel &amp; Firebase Ecosystem.
         </div>
     </footer>
+
+    <!-- Skrip Menu Dinamis -->
+    <script src="/js/menu.js"></script>
 </body>
 </html>

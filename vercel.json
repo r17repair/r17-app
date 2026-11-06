@@ -9,6 +9,7 @@
     { "src": "/firmware", "dest": "/webapps/firmware/firmware.html" },
     { "src": "/schematic", "dest": "/webapps/schematic/schematic.html" },
     { "src": "/tools", "dest": "/webapps/tools/tools.html" },
+    { "src": "/tutorials", "dest": "/webapps/tutorials/tutorials.html" },
     { "src": "/login", "dest": "/auth/login.html" },
     { "src": "/register", "dest": "/auth/register.html" },
     { "src": "/(.*)", "dest": "/index.html" }
