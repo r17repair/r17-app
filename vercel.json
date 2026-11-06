@@ -1,9 +1,45 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" }
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/firmware",
+      "destination": "/webapps/firmware/firmware.html"
+    },
+    {
+      "source": "/schematic",
+      "destination": "/webapps/schematic/schematic.html"
+    },
+    {
+      "source": "/tools",
+      "destination": "/webapps/tools/tools.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/auth/login.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/auth/register.html"
+    }
   ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
   ]
 }
