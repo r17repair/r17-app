@@ -54,6 +54,8 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // Mengarahkan kembali ke landing page Blogspot setelah logout
+      window.location.href = "https://r17repair.my.id";
     } catch (error) {
       console.error("Gagal logout:", error);
     }
