@@ -57,7 +57,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex flex-1 items-center justify-center bg-slate-50">
         <p className="text-sm font-bold text-slate-600">Memuat data profil teknisi...</p>
       </div>
     );
@@ -65,9 +65,9 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-slate-50">
         <p className="text-sm text-slate-600 font-medium">Anda belum masuk. Silakan login terlebih dahulu.</p>
-        <Link href="/" className="bg-[#0066cc] text-white text-xs font-bold px-4 py-2 rounded-lg">
+        <Link href="/" className="rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700">
           ← Kembali ke Beranda
         </Link>
       </div>
@@ -75,19 +75,19 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex-1 bg-slate-50">
       {/* Header */}
-      <div className="bg-[#002b66] text-white py-6 px-8 shadow">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-extrabold uppercase tracking-wide">👤 Profil Teknisi</h1>
-          <Link href="/" className="bg-[#0066cc] hover:bg-[#0055aa] text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+      <div className="border-b border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-4">
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">Profil Teknisi</h1>
+          <Link href="/" className="rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700">
             ← Kembali ke Beranda
           </Link>
         </div>
       </div>
 
       {/* Kartu Detail User */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6">
         {loadError && (
           <p role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
             {loadError}
@@ -95,10 +95,10 @@ export default function ProfilePage() {
         )}
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
           {user.photoURL && (
-            <img src={user.photoURL} alt="Foto Profil" className="w-20 h-20 rounded-full border-2 border-[#0066cc]" />
+            <img src={user.photoURL} alt="Foto Profil" className="h-20 w-20 rounded-full border-2 border-sky-600" />
           )}
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-lg font-bold text-[#002b66]">{profile?.name || user.displayName}</h2>
+            <h2 className="text-lg font-bold text-slate-900">{profile?.name || user.displayName}</h2>
             <p className="text-xs text-slate-500 mt-0.5">{profile?.email || user.email}</p>
             
             <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start items-center">

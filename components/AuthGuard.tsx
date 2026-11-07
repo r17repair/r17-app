@@ -27,8 +27,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <p className="text-xs font-bold text-slate-600 tracking-wide">MEMERIKSA SESI TEKNISI...</p>
+      <div className="flex flex-1 items-center justify-center bg-slate-50">
+        <p className="text-xs font-bold tracking-wide text-slate-600">MEMERIKSA SESI TEKNISI...</p>
       </div>
     );
   }
@@ -36,25 +36,25 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   // Jika belum login, cegah akses dan tampilkan tombol login wajib
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 text-center">
-        <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm max-w-md w-full">
-          <div className="bg-[#0066cc] text-white w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4 font-black text-lg">
+      <div className="flex flex-1 flex-col items-center justify-center bg-slate-50 px-4 py-10 text-center">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-50 text-lg font-black text-sky-700">
             R17
           </div>
-          <h2 className="text-base font-extrabold text-[#002b66] uppercase tracking-wide">Akses Terbatas Teknisi</h2>
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+          <h2 className="text-base font-extrabold uppercase tracking-wide text-slate-900">Akses Terbatas Teknisi</h2>
+          <p className="mt-2 text-xs leading-relaxed text-slate-600">
             Anda wajib melakukan *login* menggunakan akun Google terlebih dahulu untuk mengakses Firmware, Schematic, Tools, dan Direktori Servis R17 di Vercel App.
           </p>
           <div className="mt-6 flex flex-col gap-3">
             <button
               onClick={handleLogin}
-              className="w-full bg-[#0099ff] hover:bg-[#007acc] text-white text-xs font-bold py-3 rounded-xl transition shadow cursor-pointer flex items-center justify-center gap-2"
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-600 py-3 text-xs font-bold text-white transition hover:bg-sky-700"
             >
               🔑 Login dengan Google Teknisi
             </button>
             <a
               href="https://r17repair.my.id"
-              className="text-xs font-bold text-slate-500 hover:text-[#0066cc] transition py-1"
+              className="py-1 text-xs font-bold text-slate-500 transition hover:text-sky-700"
             >
               ← Kembali ke Landing Page (Blogspot)
             </a>

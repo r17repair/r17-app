@@ -1,79 +1,137 @@
-// app/page.tsx
-import Header from "@/components/Header";
+import Link from "next/link";
 import DownloadBox from "@/components/DownloadBox";
+
+const featuredGuides = [
+  {
+    category: "Troubleshooting",
+    title: "Analisis kerusakan ponsel mati total",
+    description:
+      "Panduan pengecekan dasar menggunakan power supply dan hukum Ohm untuk menelusuri jalur short.",
+  },
+  {
+    category: "Tips Teknisi",
+    title: "Pemeriksaan awal sebelum proses flashing",
+    description:
+      "Langkah persiapan untuk membantu proses servis software berjalan lebih aman dan terarah.",
+  },
+  {
+    category: "Firmware & Software",
+    title: "Panduan memilih firmware yang sesuai",
+    description:
+      "Kenali model perangkat, versi, dan detail berkas sebelum memulai proses perbaikan.",
+  },
+];
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <Header />
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#002b66] via-[#0066cc] to-[#0099ff] text-white py-12 px-6 border-b-4 border-[#0099ff]">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-extrabold mb-3">
-            R17 Repair Portal &amp; Micro-App Hub
-          </h1>
-          <p className="text-sm text-sky-100 max-w-2xl">
-            Pusat kendali aplikasi Vercel untuk manajemen firmware, skema jalur, dan autentikasi sesi aman terintegrasi Firebase.
-          </p>
+    <main className="flex-1 bg-slate-50 text-slate-900">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700">
+            R17 Repair · Portal Teknisi
+          </span>
+          <div className="mt-5 max-w-3xl">
+            <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl">
+              Referensi servis dan direktori teknis, dalam satu tempat.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+              Temukan tutorial, troubleshooting, firmware, schematic, dan software untuk mendukung
+              pekerjaan teknisi sehari-hari.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href="/tutorials"
+                className="rounded-lg bg-sky-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-sky-700"
+              >
+                Jelajahi Panduan
+              </Link>
+              <a
+                href="https://r17repair.my.id"
+                className="rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
+              >
+                Kunjungi Blog Utama
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Konten Utama & Kotak Unduhan Real-time */}
-      <div className="max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div>
-          <h2 className="font-extrabold text-[#002b66] text-lg mb-4 uppercase tracking-wide">
-            Direktori File Unggulan
-          </h2>
-          {/* Uji Coba Komponen Counter Realtime Database */}
-          <DownloadBox
-            fileId="firmware_xiaomi_note10"
-            fileName="Xiaomi Redmi Note 10 Pro Stock ROM"
-            filePath="firmware/firmware_xiaomi_note10"
-          />
-          <DownloadBox
-            fileId="schematic_oppo_reno5"
-            fileName="Oppo Reno 5 Boardview & Bitmap Schematic"
-            filePath="schematic/schematic_oppo_reno5"
-          />
-        </div>
+      <div className="mx-auto max-w-7xl space-y-12 px-4 py-10 sm:px-6 lg:px-8">
+        <section>
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-sky-700">
+                Direktori R17 Vault
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-slate-900">Berkas pilihan</h2>
+            </div>
+            <Link href="/firmware" className="text-sm font-semibold text-sky-700 hover:text-sky-800">
+              Lihat direktori
+            </Link>
+          </div>
+          <div className="grid gap-5 lg:grid-cols-[1.4fr_0.8fr]">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <DownloadBox
+                fileId="firmware_xiaomi_note10"
+                fileName="Xiaomi Redmi Note 10 Pro Stock ROM"
+                filePath="firmware/firmware_xiaomi_note10"
+              />
+              <DownloadBox
+                fileId="schematic_oppo_reno5"
+                fileName="Oppo Reno 5 Boardview & Bitmap Schematic"
+                filePath="schematic/schematic_oppo_reno5"
+              />
+            </div>
+            <aside className="h-fit rounded-xl border border-slate-200 bg-white p-5">
+              <span className="text-xs font-bold uppercase tracking-wider text-sky-700">
+                Tentang Vault
+              </span>
+              <h3 className="mt-2 text-base font-bold text-slate-900">Direktori file R17 Repair</h3>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Katalog file terhubung ke Firebase Realtime Database. Ketersediaan unduhan
+                mengikuti tautan yang disediakan pada masing-masing item.
+              </p>
+              <Link
+                href="/firmware"
+                className="mt-4 inline-flex rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-sky-700"
+              >
+                Buka Firmware &amp; Software
+              </Link>
+            </aside>
+          </div>
+        </section>
 
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm h-fit">
-          <h3 className="font-bold text-[#002b66] text-base mb-2">🔐 Firebase Status Node</h3>
-          <p className="text-xs text-slate-600 mb-4">
-            Data unduhan di atas terhubung langsung ke Firebase Realtime Database secara sinkron dan instan.
-          </p>
-          <div className="bg-slate-100 p-3 rounded text-[11px] text-slate-700 font-mono">
-            Database URL: r17-repair-default-rtdb.firebaseio.com
+        <section>
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wider text-sky-700">
+                Wawasan Teknisi
+              </p>
+              <h2 className="mt-1 text-xl font-bold text-slate-900">Panduan dan topik pilihan</h2>
+            </div>
+            <Link href="/tutorials" className="text-sm font-semibold text-sky-700 hover:text-sky-800">
+              Semua tutorial
+            </Link>
           </div>
-        </div>
-      </div>
-
-      {/* Bagian Tutorial & Panduan Servis Cepat */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <h2 className="text-lg font-extrabold text-[#002b66] mb-4 flex items-center gap-2">
-          💡 Panduan &amp; Tutorial Teknisi Pilihan
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">Bypass FRP</span>
-            <h3 className="font-bold text-slate-800 text-sm mt-2">Cara Bypass FRP Semua Versi Android Mediatek Terbaru</h3>
-            <p className="text-xs text-slate-500 mt-1">Panduan lengkap langkah demi langkah melewati verifikasi akun Google setelah reset pabrik.</p>
-            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
+          <div className="grid gap-4 md:grid-cols-3">
+            {featuredGuides.map((guide) => (
+              <Link
+                key={guide.title}
+                href="/tutorials"
+                className="group rounded-xl border border-slate-200 bg-white p-5 transition hover:border-sky-500"
+              >
+                <span className="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-700">
+                  {guide.category}
+                </span>
+                <h3 className="mt-3 text-sm font-bold leading-5 text-slate-900">{guide.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-slate-600">{guide.description}</p>
+                <span className="mt-4 inline-block text-xs font-bold text-sky-700 group-hover:text-sky-800">
+                  Jelajahi panduan
+                </span>
+              </Link>
+            ))}
           </div>
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Dead Boot</span>
-            <h3 className="font-bold text-slate-800 text-sm mt-2">Analisis Kerusakan Ponsel Mati Total (Dead Boot Repair)</h3>
-            <p className="text-xs text-slate-500 mt-1">Teknik pengecekan menggunakan Power Supply dan hukum Ohm dasar untuk melacak jalur short.</p>
-            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded">Emem / UFS</span>
-            <h3 className="font-bold text-slate-800 text-sm mt-2">Teknik Pembacaan IC eMMC &amp; UFS Menggunakan EasyJTAG</h3>
-            <p className="text-xs text-slate-500 mt-1">Solusi praktis dump file dan perbaikan partisi korup pada ponsel yang mengalami bootloop.</p>
-            <span className="text-xs text-sky-600 font-bold mt-3 inline-block cursor-pointer hover:underline">Baca Selengkapnya →</span>
-          </div>
-        </div>
+        </section>
       </div>
     </main>
   );

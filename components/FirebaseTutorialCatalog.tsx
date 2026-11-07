@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { onValue, ref } from "firebase/database";
 import { database } from "@/lib/firebase";
 import { getSafeDirectDownloadURL } from "@/lib/fileCatalog";
+import Breadcrumb from "@/components/Breadcrumb";
 
 interface Tutorial {
   id: string;
@@ -96,13 +97,37 @@ export default function FirebaseTutorialCatalog() {
     return <p className="py-8 text-center text-sm text-slate-500">Belum ada tutorial.</p>;
   }
 
+  const troubleshootingIndex = tutorials.findIndex((tutorial) => {
+    const category = tutorial.category?.toLocaleLowerCase("id") ?? "";
+    return category.includes("troubleshoot") || category.includes("solusi");
+  });
+  const tipsIndex = tutorials.findIndex((tutorial) => {
+    const category = tutorial.category?.toLocaleLowerCase("id") ?? "";
+    return category.includes("tips") || category.includes("trik");
+  });
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {tutorials.map((tutorial) => (
-        <article key={tutorial.id} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      {tutorials.map((tutorial, index) => (
+        <article
+          key={tutorial.id}
+          id={
+            index === troubleshootingIndex
+              ? "troubleshooting"
+              : index === tipsIndex
+                ? "tips"
+                : undefined
+          }
+          className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-sky-500"
+        >
+          <Breadcrumb
+            category="Tutorial & Panduan"
+            categoryHref="/tutorials"
+            title={tutorial.title}
+          />
           <div className="flex flex-wrap items-center gap-2">
             {tutorial.category && (
-              <span className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-bold text-sky-800">
+              <span className="rounded-full bg-sky-50 px-2.5 py-0.5 text-[10px] font-bold text-sky-700">
                 {tutorial.category}
               </span>
             )}
@@ -112,7 +137,7 @@ export default function FirebaseTutorialCatalog() {
               </span>
             )}
           </div>
-          <h2 className="mt-2 text-base font-bold text-[#002b66]">{tutorial.title}</h2>
+          <h2 className="mt-2 text-base font-bold text-slate-900">{tutorial.title}</h2>
           {tutorial.description && (
             <p className="mt-2 text-sm text-slate-600">{tutorial.description}</p>
           )}

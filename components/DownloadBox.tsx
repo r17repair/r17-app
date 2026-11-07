@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { database } from "@/lib/firebase";
 import { onValue, ref, runTransaction } from "firebase/database";
 import { getSafeDirectDownloadURL, getSafeDownloadURL } from "@/lib/fileCatalog";
+import Breadcrumb from "@/components/Breadcrumb";
 
 interface DownloadBoxProps {
   fileId: string;
@@ -27,6 +28,19 @@ export default function DownloadBox({
   downloadCount: initialDownloadCount,
   details = [],
 }: DownloadBoxProps) {
+  const categoryKey = filePath?.split("/")[0] ?? "firmware";
+  const breadcrumbCategory =
+    categoryKey === "schematic" || categoryKey === "schematics"
+      ? "Schematic & Layout"
+      : categoryKey === "tools"
+        ? "Tools & Drivers"
+        : "Firmware & Software";
+  const breadcrumbHref =
+    categoryKey === "schematic" || categoryKey === "schematics"
+      ? "/schematic"
+      : categoryKey === "tools"
+        ? "/tools"
+        : "/firmware";
   const [downloadCount, setDownloadCount] = useState<number>(0);
   const [countOverride, setCountOverride] = useState<number | null>(null);
   const [countLoading, setCountLoading] = useState(
@@ -116,13 +130,14 @@ export default function DownloadBox({
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm my-4">
-      <h3 className="font-bold text-[#002b66] text-base mb-2">📦 {fileName}</h3>
-      <p className="text-xs text-slate-600 mb-4">
+    <article className="my-2 rounded-xl border border-slate-200 bg-white p-5 transition hover:border-sky-500">
+      <Breadcrumb category={breadcrumbCategory} categoryHref={breadcrumbHref} title={fileName} />
+      <h3 className="mb-2 text-base font-bold text-slate-900">{fileName}</h3>
+      <p className="mb-4 text-xs leading-5 text-slate-600">
         {description && <span className="block mb-2">{description}</span>}
         {details.length > 0 && `${details.join(" | ")}. `}
         Total diunduh oleh teknisi:{" "}
-        <strong className="text-[#0099ff]">
+        <strong className="text-sky-700">
           {countLoading ? "..." : countError ? "tidak tersedia" : `${visibleDownloadCount}x`}
         </strong>
       </p>
@@ -134,9 +149,9 @@ export default function DownloadBox({
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleDownload}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs transition-all shadow-md inline-flex items-center gap-2"
+            className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-sky-700"
           >
-            📥 Unduh Berkas
+            Unduh Berkas
           </a>
         ) : (
           <p className="text-xs text-slate-500" role={urlError ? "alert" : undefined}>
@@ -152,12 +167,12 @@ export default function DownloadBox({
             href={safeViewURL}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-lg bg-sky-600 px-5 py-2.5 text-xs font-bold text-white shadow transition hover:bg-sky-700"
+            className="rounded-lg border border-sky-200 bg-sky-50 px-5 py-2.5 text-xs font-bold text-sky-700 transition hover:border-sky-300 hover:bg-sky-100"
           >
-            👁️ Lihat Berkas
+            Lihat Berkas
           </a>
         )}
       </div>
-    </div>
+    </article>
   );
 }

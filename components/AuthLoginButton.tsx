@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { auth, googleProvider, database } from "@/lib/firebase";
 import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { ref, set, get, child } from "firebase/database";
+import { ref, set, get } from "firebase/database";
 
 export default function AuthLoginButton() {
   const [user, setUser] = useState<User | null>(null);
@@ -68,21 +68,21 @@ export default function AuthLoginButton() {
   if (user) {
     return (
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 bg-slate-800/60 px-3 py-1 rounded-full border border-sky-400/30">
+        <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1">
           {user.photoURL && (
             <img 
               src={user.photoURL} 
               alt="Avatar" 
-              className="w-6 h-6 rounded-full border border-white" 
+              className="h-6 w-6 rounded-full border border-sky-200"
             />
           )}
-          <span className="text-xs text-white font-medium max-w-[120px] truncate">
+          <span className="max-w-[120px] truncate text-xs font-medium text-slate-700">
             {user.displayName || user.email}
           </span>
         </div>
         <button
           onClick={handleLogout}
-          className="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition-all cursor-pointer shadow"
+          className="cursor-pointer rounded-lg px-3 py-1.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
         >
           Keluar
         </button>
@@ -93,9 +93,9 @@ export default function AuthLoginButton() {
   return (
     <button
       onClick={handleLogin}
-      className="bg-[#0099ff] hover:bg-[#007acc] text-white font-bold px-4 py-2 rounded-lg text-xs transition-all shadow-md flex items-center gap-2 cursor-pointer border border-sky-300/40"
+      className="flex cursor-pointer items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700"
     >
-      🔑 Login Teknisi
+      Login Teknisi
     </button>
   );
 }

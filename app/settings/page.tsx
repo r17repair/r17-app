@@ -85,7 +85,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex flex-1 items-center justify-center bg-slate-50">
         <p className="text-sm font-bold text-slate-600">Memuat pengaturan akun...</p>
       </div>
     );
@@ -93,9 +93,9 @@ export default function SettingsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+      <div className="flex flex-1 flex-col items-center justify-center gap-4 bg-slate-50">
         <p className="text-sm text-slate-600 font-medium">Silakan login terlebih dahulu untuk mengakses halaman ini.</p>
-        <Link href="/" className="bg-[#0066cc] text-white text-xs font-bold px-4 py-2 rounded-lg">
+        <Link href="/" className="rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700">
           ← Kembali ke Beranda
         </Link>
       </div>
@@ -103,19 +103,19 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="flex-1 bg-slate-50">
       {/* Header */}
-      <div className="bg-[#002b66] text-white py-6 px-8 shadow">
-        <div className="max-w-3xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-extrabold uppercase tracking-wide">⚙️ Pengaturan Akun Teknisi</h1>
-          <Link href="/" className="bg-[#0066cc] hover:bg-[#0055aa] text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+      <div className="border-b border-slate-200 bg-white px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4">
+          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">Pengaturan Akun Teknisi</h1>
+          <Link href="/" className="rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700">
             ← Kembali ke Beranda
           </Link>
         </div>
       </div>
 
       {/* Form Pengaturan */}
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <div className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">
         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div className="flex items-center gap-4 pb-6 border-b border-slate-100">
             {user.photoURL && (
@@ -150,7 +150,7 @@ export default function SettingsPage() {
                 value={workshopName} 
                 onChange={(e) => setWorkshopName(e.target.value)}
                 placeholder="Contoh: R17 Cellservice"
-                className="w-full text-xs p-3 border border-slate-300 rounded-lg focus:outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-300 p-3 text-xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
               />
             </div>
 
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                 value={phone} 
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Contoh: 081234567890"
-                className="w-full text-xs p-3 border border-slate-300 rounded-lg focus:outline-none focus:border-sky-500"
+                className="w-full rounded-lg border border-slate-300 p-3 text-xs focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-100"
               />
             </div>
 
@@ -169,7 +169,7 @@ export default function SettingsPage() {
               <button 
                 type="submit" 
                 disabled={saving || Boolean(loadError)}
-                className="bg-[#0066cc] hover:bg-[#0055aa] text-white text-xs font-bold px-5 py-2.5 rounded-lg transition shadow cursor-pointer disabled:opacity-50"
+                className="cursor-pointer rounded-lg bg-sky-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-sky-700 disabled:opacity-50"
               >
                 {saving ? "Menyimpan..." : "Simpan Perubahan"}
               </button>

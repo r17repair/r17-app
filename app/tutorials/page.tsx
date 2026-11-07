@@ -1,25 +1,22 @@
 import FirebaseTutorialCatalog from "@/components/FirebaseTutorialCatalog";
-import Header from "@/components/Header";
 
 export default function TutorialsPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Header />
-      <main>
-        <div className="bg-[#002b66] px-8 py-6 text-white shadow">
-          <div className="mx-auto max-w-6xl">
-            <h1 className="text-xl font-extrabold uppercase tracking-wide">
-              💡 Tutorial &amp; Panduan Teknisi
-            </h1>
-            <p className="mt-1 text-xs text-sky-200">
-              Panduan servis dan materi teknis dari direktori R17 Repair.
-            </p>
-          </div>
+    <main className="flex-1 bg-slate-50">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-wider text-sky-700">Wawasan R17</p>
+          <h1 className="mt-2 text-2xl font-extrabold text-slate-900">
+            Tutorial &amp; Panduan Teknisi
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+            Panduan servis, troubleshooting, dan materi teknis dari direktori R17 Repair.
+          </p>
         </div>
-        <div className="mx-auto max-w-6xl px-6 py-8">
-          <FirebaseTutorialCatalog />
-        </div>
-      </main>
-    </div>
+      </section>
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <FirebaseTutorialCatalog />
+      </div>
+    </main>
   );
 }
