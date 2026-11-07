@@ -1,9 +1,7 @@
-import AuthGuard from "@/components/AuthGuard";
 import FirebaseFileCatalog from "@/components/FirebaseFileCatalog";
 
 export default function SchematicPage() {
   return (
-    <AuthGuard>
       <main className="flex-1 bg-slate-50">
         <section className="border-b border-slate-200 bg-white">
           <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -22,6 +20,5 @@ export default function SchematicPage() {
           <FirebaseFileCatalog path="schematics" />
         </div>
       </main>
-    </AuthGuard>
   );
 }

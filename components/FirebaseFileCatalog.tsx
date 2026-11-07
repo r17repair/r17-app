@@ -1,100 +1,67 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { onValue, ref } from "firebase/database";
-import { database } from "@/lib/firebase";
-import { getSafeDirectDownloadURL, getSafeDownloadURL } from "@/lib/fileCatalog";
 import DownloadBox from "@/components/DownloadBox";
 
-interface FirebaseFile {
+interface VaultFile {
   id: string;
   title: string;
-  downloadURL: string | null;
-  viewURL: string | null;
   description: string | null;
-  downloadCount: number | null;
-  details: string[];
+  category: string | null;
+  version: string | null;
+  size: string | null;
+  downloadCount: number;
+  tokenCost: number;
+  viewUrl: string | null;
+  downloadUrl: string | null;
 }
 
 interface FirebaseFileCatalogProps {
   path: string;
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function displayValue(value: unknown): string | null {
-  if (typeof value === "string" && value.trim()) return value.trim();
-  if (typeof value === "number") return String(value);
-  return null;
-}
-
-function toFirebaseFiles(value: unknown): FirebaseFile[] | null {
-  if (!Array.isArray(value) && !isRecord(value)) return null;
-
-  const entries = Array.isArray(value)
-    ? value.map((item, index) => [String(index), item] as const)
-    : Object.entries(value);
-
-  return entries.flatMap(([id, rawItem]) => {
-    if (!isRecord(rawItem)) return [];
-
-    const title =
-      displayValue(rawItem.title) ??
-      displayValue(rawItem.name) ??
-      displayValue(rawItem.fileName) ??
-      displayValue(rawItem.label) ??
-      id;
-    const downloadURL = getSafeDownloadURL(rawItem);
-    const viewURL = getSafeDirectDownloadURL(rawItem.urlView);
-    const description = displayValue(rawItem.description);
-    const downloadCount =
-      typeof rawItem.downloadCount === "number" ? rawItem.downloadCount : null;
-    const details = [
-      displayValue(rawItem.category) ?? displayValue(rawItem.type),
-      displayValue(rawItem.version),
-      displayValue(rawItem.size) ?? displayValue(rawItem.fileSize),
-    ].filter((detail): detail is string => detail !== null);
-
-    return [{ id, title, downloadURL, viewURL, description, downloadCount, details }];
-  });
-}
-
 export default function FirebaseFileCatalog({ path }: FirebaseFileCatalogProps) {
-  const [files, setFiles] = useState<FirebaseFile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    path: string;
+    files: VaultFile[];
+    error: string | null;
+  }>({ path: "", files: [], error: null });
 
   useEffect(() => {
-    const unsubscribe = onValue(
-      ref(database, path),
-      (snapshot) => {
-        if (!snapshot.exists()) {
-          setFiles([]);
-          setError(null);
-        } else {
-          const catalog = toFirebaseFiles(snapshot.val());
-          if (catalog === null) {
-            setFiles([]);
-            setError("Format direktori Firebase tidak valid.");
-          } else {
-            setFiles(catalog);
-            setError(null);
-          }
-        }
-        setLoading(false);
-      },
-      (cause) => {
-        console.error(`Gagal memuat direktori Firebase "${path}":`, cause);
-        setFiles([]);
-        setError("Direktori tidak dapat dimuat. Periksa koneksi dan izin Firebase.");
-        setLoading(false);
-      },
-    );
+    const controller = new AbortController();
+    const category = path.split("/")[0];
 
-    return unsubscribe;
+    const loadCatalog = async () => {
+      try {
+        const response = await fetch(
+          `/api/vault/catalog?category=${encodeURIComponent(category)}`,
+          { signal: controller.signal, cache: "no-store" },
+        );
+        const result = (await response.json()) as { files?: VaultFile[]; error?: string };
+        if (!response.ok) throw new Error(result.error ?? "Direktori tidak dapat dimuat.");
+        if (!controller.signal.aborted) {
+          setResult({ path, files: result.files ?? [], error: null });
+        }
+      } catch (cause) {
+        if (cause instanceof DOMException && cause.name === "AbortError") return;
+        console.error(`Gagal memuat direktori "${path}":`, cause);
+        if (!controller.signal.aborted) {
+          setResult({
+            path,
+            files: [],
+            error: cause instanceof Error ? cause.message : "Direktori tidak dapat dimuat.",
+          });
+        }
+      }
+    };
+    void loadCatalog();
+
+    return () => controller.abort();
   }, [path]);
+
+  const loading = result.path !== path;
+  const files = loading ? [] : result.files;
+  const error = loading ? null : result.error;
 
   if (loading) {
     return <p className="py-8 text-center text-sm text-slate-500">Memuat direktori...</p>;
@@ -119,12 +86,14 @@ export default function FirebaseFileCatalog({ path }: FirebaseFileCatalogProps) 
           key={file.id}
           fileId={file.id}
           fileName={file.title}
-          downloadURL={file.downloadURL}
           filePath={`${path}/${file.id}`}
-          viewURL={file.viewURL}
+          viewUrl={file.viewUrl}
           description={file.description}
           downloadCount={file.downloadCount}
-          details={file.details}
+          tokenCost={file.tokenCost}
+          details={[file.category, file.version, file.size].filter(
+            (detail): detail is string => Boolean(detail),
+          )}
         />
       ))}
     </div>

@@ -2,8 +2,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth, googleProvider } from "@/lib/firebase";
-import { onAuthStateChanged, signInWithPopup, User } from "firebase/auth";
+import Link from "next/link";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -16,14 +17,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     });
     return () => unsubscribe();
   }, []);
-
-  const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Gagal login:", error);
-    }
-  };
 
   if (loading) {
     return (
@@ -46,12 +39,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             Anda wajib melakukan *login* menggunakan akun Google terlebih dahulu untuk mengakses Firmware, Schematic, Tools, dan Direktori Servis R17 di Vercel App.
           </p>
           <div className="mt-6 flex flex-col gap-3">
-            <button
-              onClick={handleLogin}
-              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-600 py-3 text-xs font-bold text-white transition hover:bg-sky-700"
+            <Link
+              href="/login"
+              className="flex w-full items-center justify-center rounded-xl bg-sky-600 py-3 text-xs font-bold text-white transition hover:bg-sky-700"
             >
-              🔑 Login dengan Google Teknisi
-            </button>
+              Masuk dengan Google atau Email
+            </Link>
             <a
               href="https://r17repair.my.id"
               className="py-1 text-xs font-bold text-slate-500 transition hover:text-sky-700"

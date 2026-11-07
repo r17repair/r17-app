@@ -1,57 +1,29 @@
-// components/AuthLoginButton.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { auth, googleProvider, database } from "@/lib/firebase";
-import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { ref, set, get } from "firebase/database";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 export default function AuthLoginButton() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-
-      // Simpan/perbarui profil user di Firebase Realtime Database saat login
-      if (currentUser) {
-        try {
-          const userRef = ref(database, `users/${currentUser.uid}`);
-          const snapshot = await get(userRef);
-
-          if (!snapshot.exists()) {
-            // Jika user baru pertama kali login, beri role default "free"
-            await set(userRef, {
-              uid: currentUser.uid,
-              name: currentUser.displayName || "Teknisi",
-              email: currentUser.email,
-              photoURL: currentUser.photoURL,
-              role: "free", // Pilihan role: "free", "vip", "admin"
-              createdAt: new Date().toISOString(),
-              lastLogin: new Date().toISOString(),
-            });
-          } else {
-            // Jika user lama, perbarui waktu login terakhir
-            await set(ref(database, `users/${currentUser.uid}/lastLogin`), new Date().toISOString());
-          }
-        } catch (error) {
-          console.error("Gagal menyinkronkan data user ke database:", error);
-        }
+  useEffect(() => onAuthStateChanged(auth, async (currentUser) => {
+    setUser(currentUser);
+    if (currentUser) {
+      try {
+        const idToken = await currentUser.getIdToken();
+        const response = await fetch("/api/account", {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+        if (!response.ok) throw new Error("Gagal menyiapkan profil R17 Vault.");
+      } catch (error) {
+        console.error("Gagal menyiapkan profil R17 Vault:", error);
       }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Gagal login:", error);
     }
-  };
+    setLoading(false);
+  }), []);
 
   const handleLogout = async () => {
     try {
@@ -62,7 +34,7 @@ export default function AuthLoginButton() {
   };
 
   if (loading) {
-    return <span className="text-xs text-sky-200">Memuat sesi...</span>;
+    return <span className="text-xs text-slate-500">Memuat sesi...</span>;
   }
 
   if (user) {
@@ -70,11 +42,7 @@ export default function AuthLoginButton() {
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1">
           {user.photoURL && (
-            <img 
-              src={user.photoURL} 
-              alt="Avatar" 
-              className="h-6 w-6 rounded-full border border-sky-200"
-            />
+            <img src={user.photoURL} alt="" className="h-6 w-6 rounded-full border border-sky-200" />
           )}
           <span className="max-w-[120px] truncate text-xs font-medium text-slate-700">
             {user.displayName || user.email}
@@ -91,11 +59,11 @@ export default function AuthLoginButton() {
   }
 
   return (
-    <button
-      onClick={handleLogin}
-      className="flex cursor-pointer items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700"
+    <Link
+      href="/login"
+      className="inline-flex cursor-pointer items-center rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700"
     >
       Login Teknisi
-    </button>
+    </Link>
   );
 }

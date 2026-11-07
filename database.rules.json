@@ -1,0 +1,28 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "tutorials": {
+      ".read": true
+    },
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid"
+      }
+    },
+    "transactions": {
+      ".indexOn": ["user_id", "amount_idr", "status"],
+      "$trxId": {
+        ".read": "auth != null && data.child('user_id').val() === auth.uid"
+      }
+    },
+    "files": {
+      ".indexOn": ["category", "subdomain_type", "status", "contributor_id"]
+    },
+    "download_logs": {
+      "$logId": {
+        ".read": "auth != null && data.child('user_id').val() === auth.uid"
+      }
+    }
+  }
+}

@@ -4,14 +4,15 @@
 import { useEffect, useState } from "react";
 import { auth, database } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { ref, onValue, update } from "firebase/database";
+import { ref, onValue } from "firebase/database";
+import { apiRequest } from "@/lib/clientApi";
 import Link from "next/link";
 
 export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [workshopName, setWorkshopName] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
-  const [role, setRole] = useState<string>("free");
+  const [role, setRole] = useState<string>("member");
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -27,7 +28,7 @@ export default function SettingsPage() {
       setLoading(true);
 
       if (currentUser) {
-        const userRef = ref(database, `users/${currentUser.uid}`);
+        const userRef = ref(database, `users/${currentUser.uid}/profile`);
         unsubscribeProfile = onValue(
           userRef,
           (snapshot) => {
@@ -35,11 +36,11 @@ export default function SettingsPage() {
               const data = snapshot.val();
               setWorkshopName(data.workshopName || "");
               setPhone(data.phone || "");
-              setRole(data.role || "free");
+              setRole(data.role === "admin" || data.role === "contributor" ? data.role : "member");
             } else {
               setWorkshopName("");
               setPhone("");
-              setRole("free");
+              setRole("member");
             }
             setLoading(false);
           },
@@ -68,11 +69,12 @@ export default function SettingsPage() {
     setMessage("");
 
     try {
-      const userRef = ref(database, `users/${user.uid}`);
-      await update(userRef, {
-        workshopName: workshopName,
-        phone: phone,
-        updatedAt: new Date().toISOString(),
+      await apiRequest("/api/account", {
+        method: "PATCH",
+        body: JSON.stringify({
+          workshopName,
+          phone,
+        }),
       });
       setMessage("Pengaturan profil berhasil disimpan!");
     } catch (error) {

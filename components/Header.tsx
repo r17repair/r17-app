@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { auth, googleProvider, database } from "@/lib/firebase";
-import { signInWithPopup, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { ref, set, get } from "firebase/database";
+import { auth } from "@/lib/firebase";
+import { signOut, onAuthStateChanged, User } from "firebase/auth";
 
 const navigation = [
   { label: "Beranda", href: "/" },
@@ -19,47 +18,30 @@ const navigation = [
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [accountError, setAccountError] = useState("");
   const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
-      setLoading(false);
-
       if (currentUser) {
         try {
-          const userRef = ref(database, `users/${currentUser.uid}`);
-          const snapshot = await get(userRef);
-
-          if (!snapshot.exists()) {
-            await set(userRef, {
-              uid: currentUser.uid,
-              name: currentUser.displayName || "Teknisi",
-              email: currentUser.email,
-              photoURL: currentUser.photoURL,
-              role: "free",
-              createdAt: new Date().toISOString(),
-              lastLogin: new Date().toISOString(),
-            });
-          } else {
-            await set(ref(database, `users/${currentUser.uid}/lastLogin`), new Date().toISOString());
-          }
+          const idToken = await currentUser.getIdToken();
+          const response = await fetch("/api/account", {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+          if (!response.ok) throw new Error("Gagal menyiapkan profil R17 Vault.");
+          setAccountError("");
         } catch (error) {
-          console.error("Gagal menyinkronkan data user:", error);
+          console.error("Gagal menyiapkan profil R17 Vault:", error);
+          setAccountError("Profil belum tersinkron. Muat ulang halaman atau coba lagi.");
         }
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
-
-  const handleLogin = async () => {
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error) {
-      console.error("Gagal login:", error);
-    }
-  };
 
   const handleLogout = async () => {
     try {
@@ -99,6 +81,12 @@ export default function Header() {
                 </span>
               </Link>
               <Link
+                href="/tokens"
+                className="hidden rounded-lg bg-sky-50 px-3 py-2 text-xs font-bold text-sky-700 transition hover:bg-sky-100 sm:inline-flex"
+              >
+                Token
+              </Link>
+              <Link
                 href="/settings"
                 className="hidden rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700 sm:inline-flex"
               >
@@ -112,15 +100,21 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <button
-              onClick={handleLogin}
+            <Link
+              href="/login"
               className="rounded-lg bg-sky-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-sky-700"
             >
               Login Teknisi
-            </button>
+            </Link>
           )}
         </div>
       </div>
+
+      {accountError && (
+        <p role="alert" className="mx-auto max-w-7xl px-4 pb-2 text-xs text-rose-700 sm:px-6 lg:px-8">
+          {accountError}
+        </p>
+      )}
 
       <nav aria-label="Navigasi utama" className="border-t border-slate-100">
         <div className="mx-auto flex max-w-7xl justify-center gap-1 overflow-x-auto px-3 py-2 sm:px-6 lg:px-8">

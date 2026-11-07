@@ -10,13 +10,15 @@ import Link from "next/link";
 interface UserProfile {
   name: string;
   email: string;
-  role: string;
+  role: "member" | "contributor" | "admin";
   createdAt: string;
+  contributorStatus?: string;
 }
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [tokenBalance, setTokenBalance] = useState(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -27,11 +29,12 @@ export default function ProfilePage() {
       unsubscribeProfile = undefined;
       setUser(currentUser);
       setProfile(null);
+      setTokenBalance(0);
       setLoadError(null);
       setLoading(true);
 
       if (currentUser) {
-        const userRef = ref(database, `users/${currentUser.uid}`);
+        const userRef = ref(database, `users/${currentUser.uid}/profile`);
         unsubscribeProfile = onValue(
           userRef,
           (snapshot) => {
@@ -44,6 +47,16 @@ export default function ProfilePage() {
             setLoading(false);
           },
         );
+        const unsubscribeWallet = onValue(
+          ref(database, `users/${currentUser.uid}/wallet/tokens`),
+          (snapshot) => setTokenBalance(typeof snapshot.val() === "number" ? snapshot.val() : 0),
+          (error) => console.error("Gagal memuat saldo token:", error),
+        );
+        const existingCleanup = unsubscribeProfile;
+        unsubscribeProfile = () => {
+          existingCleanup();
+          unsubscribeWallet();
+        };
       } else {
         setLoading(false);
       }
@@ -54,6 +67,11 @@ export default function ProfilePage() {
       unsubscribe();
     };
   }, []);
+
+  const role =
+    profile?.role === "admin" || profile?.role === "contributor"
+      ? profile.role
+      : "member";
 
   if (loading) {
     return (
@@ -103,17 +121,30 @@ export default function ProfilePage() {
             
             <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start items-center">
               <span className="text-[11px] font-bold px-3 py-1 rounded-full uppercase bg-sky-100 text-sky-800">
-                Status Akun: {profile?.role || "Free Member"}
+                Peran: {role}
               </span>
-              {profile?.role === "vip" ? (
-                <span className="text-[11px] font-bold px-3 py-1 rounded-full uppercase bg-emerald-100 text-emerald-800">
-                  Akses VIP Aktif ⭐
-                </span>
-              ) : (
-                <span className="text-[11px] font-bold px-3 py-1 rounded-full uppercase bg-amber-100 text-amber-800">
-                  Free Member (Terbatas)
+              {profile?.contributorStatus === "pending" && (
+                <span className="rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold text-amber-800">
+                  Pengajuan kontributor menunggu pemeriksaan
                 </span>
               )}
+            </div>
+            <p className="mt-3 text-sm text-slate-700">
+              Saldo token: <strong className="text-sky-700">{tokenBalance}</strong>
+            </p>
+            <div className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start">
+              <Link
+                href="/tokens"
+                className="rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-sky-700"
+              >
+                Top-up Token
+              </Link>
+              <Link
+                href="/contributor"
+                className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
+              >
+                Area Kontributor
+              </Link>
             </div>
           </div>
         </div>

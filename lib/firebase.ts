@@ -13,6 +13,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+const requiredConfigKeys = [
+  "apiKey",
+  "authDomain",
+  "databaseURL",
+  "projectId",
+  "appId",
+] as const;
+const missingConfigKeys = requiredConfigKeys.filter((key) => !firebaseConfig[key]);
+if (missingConfigKeys.length > 0) {
+  throw new Error(
+    `Konfigurasi Firebase publik belum lengkap: ${missingConfigKeys
+      .map((key) => `NEXT_PUBLIC_FIREBASE_${key.replace(/[A-Z]/g, (letter) => `_${letter}`).toUpperCase()}`)
+      .join(", ")}`,
+  );
+}
+
 // Inisialisasi Firebase (mencegah double init di Next.js)
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
